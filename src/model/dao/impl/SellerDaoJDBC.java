@@ -97,8 +97,46 @@ public class SellerDaoJDBC implements SellerDao {
 
 	@Override
 	public List<Seller> findAll() {
-		// TODO Auto-generated method stub
-		return null;
+		PreparedStatement st = null;
+		ResultSet rs = null;
+
+		try {
+			st = conn.prepareStatement(
+					"SELECT seller.*,department.Name as DepName " 
+							+ "FROM seller INNER JOIN department "							
+							+ "ON seller.DepartmentId = department.Id " 
+							+ "ORDER BY Name");
+			
+			rs = st.executeQuery();// assim que recebe, aponta para a pos 0, que n tem nada
+
+			List<Seller> list = new ArrayList<>();
+			
+			Map<Integer, Department> map = new HashMap<>(); // map aqui serve para evitar que as requisições venham
+															// em obj's separados, mas sim atrelados
+															//guarda todos os depts q forem instanciados
+
+			while (rs.next()) {// pode ser mais ou igual a zero, logo temos q percorrer
+				// verifica se o dep ja existe no map, se não existe, retorna nulo.
+				Department dep = map.get(rs.getInt("DepartmentId"));
+
+				if (dep == null) {// não existem logo instancia
+					dep = instantiateDepartment(rs);
+					// salva dep com a key sendo a id do departamento
+					map.put(rs.getInt("DepartmentId"), dep);
+				}
+
+				// instanciar seller
+				Seller Obj = instantiateSeller(rs, dep);
+				// devolve o objeto com as requisições
+				list.add(Obj);
+			}
+			return list;// se não recebeu nada, retorna nuull
+		} catch (SQLException e) {
+			throw new DbException(e.getMessage());
+		} finally {
+			DB.closeStatement(st);
+			DB.closeResultSet(rs);
+		}
 	}
 
 	@Override
@@ -145,5 +183,4 @@ public class SellerDaoJDBC implements SellerDao {
 			DB.closeResultSet(rs);
 		}
 	}
-
 }
