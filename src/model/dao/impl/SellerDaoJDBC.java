@@ -54,19 +54,11 @@ public class SellerDaoJDBC implements SellerDao {
 			rs = st.executeQuery();//assim que recebe, aponta para a pos 0, que n tem nada
 			
 			if(rs.next()) {//se veio algum resultado na requisição
-				
-				Department dep = new Department();
-				dep.setId(rs.getInt("DepartmentId"));
-				dep.setName(rs.getString("DepName"));
-				
-				Seller Obj = new Seller();
-				Obj.setId(rs.getInt("Id"));
-				Obj.setName(rs.getString("Name"));
-				Obj.setEmail(rs.getString("Email"));
-				Obj.setBaseSalary(rs.getDouble("BaseSalary"));
-				Obj.setBirthDate(rs.getDate("BirthDate"));
-				Obj.setDepartment(dep);
-				
+				//instanciar dept
+				Department dep = instantiateDepartment(rs);
+				//instanciar seller
+				Seller Obj = instantiateSeller(rs, dep);
+				//devolve o objeto com as requisições
 				return Obj;
 			}
 			
@@ -79,6 +71,26 @@ public class SellerDaoJDBC implements SellerDao {
 		}
 		
 		
+	}
+
+	private Seller instantiateSeller(ResultSet rs, Department dep) throws SQLException {//como a fução é insanciada em um local em que já é tratado a exception
+																						//Aqui não é tratada a exceção
+		Seller Obj = new Seller();
+		Obj.setId(rs.getInt("Id"));
+		Obj.setName(rs.getString("Name"));
+		Obj.setEmail(rs.getString("Email"));
+		Obj.setBaseSalary(rs.getDouble("BaseSalary"));
+		Obj.setBirthDate(rs.getDate("BirthDate"));
+		Obj.setDepartment(dep);
+		return Obj;
+	}
+
+	private Department instantiateDepartment(ResultSet rs) throws SQLException {//como a fução é insanciada em um local em que já é tratado a exception
+																				//Aqui não é tratada a exceção
+		Department dep = new Department();
+		dep.setId(rs.getInt("DepartmentId"));
+		dep.setName(rs.getString("DepName"));
+		return dep;
 	}
 
 	@Override
