@@ -5,6 +5,8 @@ import java.io.Serializable;
 //Implementar serializable é necessário para que seja possivel gravar em arquivos... transitar por redes... etc
 public class Department implements Serializable{
 
+	private static final long serialVersionUID = 1L;
+	
 	private Integer id;
 	private String name;
 
